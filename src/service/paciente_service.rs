@@ -7,7 +7,7 @@ pub struct PacienteService {
 
 }
 
-impl PacienteService { fn new(repository: Arc<PacienteRepository>) -> Self {
+impl PacienteService { pub fn new(repository: Arc<PacienteRepository>) -> Self {
     Self { repository}
 }
 
