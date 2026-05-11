@@ -10,6 +10,16 @@ impl PacienteRepository {
         Self { pool }
     }
 
+    pub async fn obtener_por_id(&self, id: i32) -> Result<Option<Paciente>, sqlx::Error> {
+        let paciente = sqlx::query_as::<_, Paciente>(
+            "SELECT id_paciente AS id, nombre, fecha_nacimiento, direccion, tipo_sangre FROM Pacientes WHERE id_paciente = $1"
+        )
+        .bind(id)
+        .fetch_optional(&self.pool)
+        .await?;    
+        Ok(paciente)
+    }
+
     pub async fn obtener_todos(&self) -> Result<Vec<Paciente>, sqlx::Error> {
         let pacientes = sqlx::query_as::<_, Paciente>(
             "SELECT id_paciente AS id, nombre, fecha_nacimiento, direccion, tipo_sangre FROM Pacientes"
