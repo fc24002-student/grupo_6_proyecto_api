@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-// Estructura principal en singular
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Especialidad {
+    #[sqlx(rename = "id_especialidad")]
     pub id: i32,
+    #[sqlx(rename = "nombre_especialidad")]
     pub nombre: String,
     pub descripcion: Option<String>,
 }

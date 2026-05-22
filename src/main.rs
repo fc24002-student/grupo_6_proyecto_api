@@ -26,8 +26,12 @@ async fn main() {
     let paciente_repository = Arc::new(repository::paciente_repository::PacienteRepository::new(pool.clone()));
     let paciente_service = Arc::new(service::paciente_service::PacienteService::new(paciente_repository));
 
+    let especialidad_repository = Arc::new(repository::especialidad_repository::EspecialidadRepository::new(pool.clone()));
+    let especialidad_service = Arc::new(service::especialidad_service::EspecialidadService::new(especialidad_repository));
+
     let app = Router::new()
-        .nest("/api/pacientes", controller::paciente_controller::paciente_router(paciente_service));
+        .nest("/api/pacientes", controller::paciente_controller::paciente_router(paciente_service))
+        .nest("/api/especialidad", controller::especialidad_controller::especialidad_router(especialidad_service));
 
     let direccion = "127.0.0.1:3000";
     let listener = tokio::net::TcpListener::bind(direccion)

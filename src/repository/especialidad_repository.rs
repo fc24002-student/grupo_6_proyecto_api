@@ -1,68 +1,64 @@
-use crate::models::especialidad::{Especialidad, CreateEspecialidad, UpdateEspecialidad};
 use sqlx::{Pool, Postgres};
+use crate::models::especialidad::{Especialidad, CreateEspecialidad, UpdateEspecialidad};
 
-pub struct EspecialidadRepository;
+pub struct EspecialidadRepository {
+    pool: Pool<Postgres>,
+}
 
 impl EspecialidadRepository {
-    // Obtener todas
-    pub async fn obtener_todas(pool: &Pool<Postgres>) -> Result<Vec<Especialidad>, sqlx::Error> {
+    pub fn new(pool: Pool<Postgres>) -> Self {
+        Self { pool }
+    }
+
+    pub async fn obtener_todas(&self) -> Result<Vec<Especialidad>, sqlx::Error> {
         let lista = sqlx::query_as::<_, Especialidad>(
-            "SELECT id, nombre, descripcion FROM public.especialidades"
+            "SELECT id_especialidad, nombre_especialidad, descripcion FROM public.especialidades"
         )
-        .fetch_all(pool)
+        .fetch_all(&self.pool)
         .await?;
-        
         Ok(lista)
     }
 
-    // Obtener por ID
-    pub async fn obtener_por_id(pool: &Pool<Postgres>, id: i32) -> Result<Option<Especialidad>, sqlx::Error> {
+    pub async fn obtener_por_id(&self, id: i32) -> Result<Option<Especialidad>, sqlx::Error> {
         let registro = sqlx::query_as::<_, Especialidad>(
-            "SELECT id, nombre, descripcion FROM public.especialidades WHERE id = $1"
+            "SELECT id_especialidad, nombre_especialidad, descripcion FROM public.especialidades WHERE id_especialidad = $1"
         )
         .bind(id)
-        .fetch_optional(pool)
+        .fetch_optional(&self.pool)
         .await?;
-        
         Ok(registro)
     }
 
-    // Insertar (POST)
-    pub async fn crear(pool: &Pool<Postgres>, datos: CreateEspecialidad) -> Result<Especialidad, sqlx::Error> {
+    pub async fn crear(&self, datos: CreateEspecialidad) -> Result<Especialidad, sqlx::Error> {
         let nueva = sqlx::query_as::<_, Especialidad>(
-            "INSERT INTO public.especialidades (nombre, descripcion) VALUES ($1, $2) RETURNING id, nombre, descripcion"
+            "INSERT INTO public.especialidades (nombre_especialidad, descripcion) VALUES ($1, $2) RETURNING id_especialidad, nombre_especialidad, descripcion"
         )
         .bind(datos.nombre)
         .bind(datos.descripcion)
-        .fetch_one(pool)
+        .fetch_one(&self.pool)
         .await?;
-        
         Ok(nueva)
     }
 
-    // Actualizar (PUT)
-    pub async fn actualizar(pool: &Pool<Postgres>, id: i32, datos: UpdateEspecialidad) -> Result<Option<Especialidad>, sqlx::Error> {
+    pub async fn actualizar(&self, id: i32, datos: UpdateEspecialidad) -> Result<Option<Especialidad>, sqlx::Error> {
         let editada = sqlx::query_as::<_, Especialidad>(
-            "UPDATE public.especialidades SET nombre = $1, descripcion = $2 WHERE id = $3 RETURNING id, nombre, descripcion"
+            "UPDATE public.especialidades SET nombre_especialidad = $1, descripcion = $2 WHERE id_especialidad = $3 RETURNING id_especialidad, nombre_especialidad, descripcion"
         )
         .bind(datos.nombre)
         .bind(datos.descripcion)
         .bind(id)
-        .fetch_optional(pool)
+        .fetch_optional(&self.pool)
         .await?;
-        
         Ok(editada)
     }
 
-    // Eliminar (DELETE)
-    pub async fn eliminar(pool: &Pool<Postgres>, id: i32) -> Result<u64, sqlx::Error> {
+    pub async fn eliminar(&self, id: i32) -> Result<u64, sqlx::Error> {
         let resultado = sqlx::query(
-            "DELETE FROM public.especialidades WHERE id = $1"
+            "DELETE FROM public.especialidades WHERE id_especialidad = $1"
         )
         .bind(id)
-        .execute(pool)
+        .execute(&self.pool)
         .await?;
-        
         Ok(resultado.rows_affected())
     }
 }

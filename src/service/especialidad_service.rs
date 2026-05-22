@@ -1,28 +1,34 @@
+use std::sync::Arc;
 use crate::models::especialidad::{Especialidad, CreateEspecialidad, UpdateEspecialidad};
 use crate::repository::especialidad_repository::EspecialidadRepository;
-use sqlx::{Pool, Postgres};
 
-pub struct EspecialidadService;
+pub struct EspecialidadService {
+    repository: Arc<EspecialidadRepository>,
+}
 
 impl EspecialidadService {
-    pub async fn listar_especialidades(pool: &Pool<Postgres>) -> Result<Vec<Especialidad>, sqlx::Error> {
-        EspecialidadRepository::obtener_todas(pool).await
+    pub fn new(repository: Arc<EspecialidadRepository>) -> Self {
+        Self { repository }
     }
 
-    pub async fn buscar_por_id(pool: &Pool<Postgres>, id: i32) -> Result<Option<Especialidad>, sqlx::Error> {
-        EspecialidadRepository::obtener_por_id(pool, id).await
+    pub async fn listar_especialidades(&self) -> Result<Vec<Especialidad>, sqlx::Error> {
+        self.repository.obtener_todas().await
     }
 
-    pub async fn registrar_especialidad(pool: &Pool<Postgres>, datos: CreateEspecialidad) -> Result<Especialidad, sqlx::Error> {
-        EspecialidadRepository::crear(pool, datos).await
+    pub async fn buscar_por_id(&self, id: i32) -> Result<Option<Especialidad>, sqlx::Error> {
+        self.repository.obtener_por_id(id).await
     }
 
-    pub async fn modificar_especialidad(pool: &Pool<Postgres>, id: i32, datos: UpdateEspecialidad) -> Result<Option<Especialidad>, sqlx::Error> {
-        EspecialidadRepository::actualizar(pool, id, datos).await
+    pub async fn registrar_especialidad(&self, datos: CreateEspecialidad) -> Result<Especialidad, sqlx::Error> {
+        self.repository.crear(datos).await
     }
 
-    pub async fn remover_especialidad(pool: &Pool<Postgres>, id: i32) -> Result<bool, sqlx::Error> {
-        let filas_afectadas = EspecialidadRepository::eliminar(pool, id).await?;
+    pub async fn modificar_especialidad(&self, id: i32, datos: UpdateEspecialidad) -> Result<Option<Especialidad>, sqlx::Error> {
+        self.repository.actualizar(id, datos).await
+    }
+
+    pub async fn remover_especialidad(&self, id: i32) -> Result<bool, sqlx::Error> {
+        let filas_afectadas = self.repository.eliminar(id).await?;
         Ok(filas_afectadas > 0)
     }
 }
