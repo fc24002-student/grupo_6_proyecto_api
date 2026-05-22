@@ -1,1 +1,2 @@
 pub mod paciente_repository;
+pub mod especialidad_repository;
