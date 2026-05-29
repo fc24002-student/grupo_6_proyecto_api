@@ -23,15 +23,22 @@ async fn main() {
         .await
         .expect("No se pudo conectar a la base de datos");
 
+    // --- Pacientes ---
     let paciente_repository = Arc::new(repository::paciente_repository::PacienteRepository::new(pool.clone()));
     let paciente_service = Arc::new(service::paciente_service::PacienteService::new(paciente_repository));
 
+    // --- Especialidades ---
     let especialidad_repository = Arc::new(repository::especialidad_repository::EspecialidadRepository::new(pool.clone()));
     let especialidad_service = Arc::new(service::especialidad_service::EspecialidadService::new(especialidad_repository));
 
+    // --- Médicos ---
+    let medico_repository = Arc::new(repository::medico_repository::MedicoRepository::new(pool.clone()));
+    let medico_service = Arc::new(service::medico_service::MedicoService::new(medico_repository));
+
     let app = Router::new()
-        .nest("/api/pacientes", controller::paciente_controller::paciente_router(paciente_service))
-        .nest("/api/especialidad", controller::especialidad_controller::especialidad_router(especialidad_service));
+        .nest("/api/pacientes",    controller::paciente_controller::paciente_router(paciente_service))
+        .nest("/api/especialidad", controller::especialidad_controller::especialidad_router(especialidad_service))
+        .nest("/api/medicos",      controller::medico_controller::medico_router(medico_service));
 
     let direccion = "127.0.0.1:3000";
     let listener = tokio::net::TcpListener::bind(direccion)
@@ -44,3 +51,4 @@ async fn main() {
         .await
         .expect("Error al iniciar el servidor");
 }
+
