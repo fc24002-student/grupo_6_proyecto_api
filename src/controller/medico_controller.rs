@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use axum::{
     Router,
-    routing::{get, post, put, delete},
+    routing::get,
     extract::{Path, State},
     http::StatusCode,
     Json,
@@ -12,7 +12,7 @@ use crate::service::medico_service::MedicoService;
 pub fn medico_router(service: Arc<MedicoService>) -> Router {
     Router::new()
         .route("/", get(get_all).post(create))
-        .route("/:id", get(get_by_id).put(update).delete(delete_medico))
+        .route("/{id}", get(get_by_id).put(update).delete(delete_medico))
         .with_state(service)
 }
 
