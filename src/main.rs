@@ -35,10 +35,13 @@ async fn main() {
     let medico_repository = Arc::new(repository::medico_repository::MedicoRepository::new(pool.clone()));
     let medico_service = Arc::new(service::medico_service::MedicoService::new(medico_repository));
 
+    // --- Configuración de las rutas (Router) ---
     let app = Router::new()
         .nest("/api/pacientes",    controller::paciente_controller::paciente_router(paciente_service))
         .nest("/api/especialidad", controller::especialidad_controller::especialidad_router(especialidad_service))
-        .nest("/api/medicos",      controller::medico_controller::medico_router(medico_service));
+        .nest("/api/medicos",      controller::medico_controller::medico_router(medico_service))
+        // NUEVO: Aquí conectamos el controlador de citas y le pasamos el acceso a la base de datos
+        .merge(controller::cita_controller::cita_router().with_state(pool.clone()));
 
     let direccion = "127.0.0.1:3000";
     let listener = tokio::net::TcpListener::bind(direccion)
@@ -51,4 +54,3 @@ async fn main() {
         .await
         .expect("Error al iniciar el servidor");
 }
-
