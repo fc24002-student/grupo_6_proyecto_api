@@ -13,7 +13,7 @@ use crate::service::diagnostico_service::DiagnosticoService;
 pub fn diagnostico_router(service: Arc<DiagnosticoService>) -> Router {
     Router::new()
         .route("/", get(get_all).post(create))
-        .route("/:id", get(get_by_id).put(update).delete(delete_handler))
+        .route("/{id}", get(get_by_id).put(update).delete(delete_handler))
         .with_state(service)
 }
 
