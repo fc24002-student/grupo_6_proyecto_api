@@ -2,21 +2,19 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post, put, delete},
+    routing::{get, put}, // Asegúrate de que estén estos 4 aquí
     Json, Router,
 };
 use sqlx::PgPool;
-
-// Importamos el modelo y el servicio que creaste antes
+// Importamos el modelo y el servicio
 use crate::{models::cita::Cita, service::cita_service};
 
 // 1. Configuración de las rutas (URLs)
+// Recibe el PgPool desde el main mediante .with_state()
 pub fn cita_router() -> Router<PgPool> {
     Router::new()
-        // Rutas generales
-        .route("/api/citas", get(obtener_citas).post(crear_cita))
-        // Rutas específicas que necesitan un ID
-        .route("/api/citas/{id}", put(actualizar_cita).delete(eliminar_cita))
+        .route("/", get(obtener_citas).post(crear_cita))
+        .route("/{id}", put(actualizar_cita).delete(eliminar_cita)) 
 }
 
 // 2. Recepcionista para crear cita (POST)

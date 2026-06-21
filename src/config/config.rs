@@ -9,11 +9,13 @@ use std::env;
 
 //postgresql://postgres:oFY9wRmn5HcOUl8R@db.wosxencvmfdnfpwrmixp.supabase.co:5432/postgres
 
+#[allow(dead_code)]
 pub fn obtener_url_base_datos() -> String {
     dotenv().ok();
     env::var("DATABASE_URL").expect("DATABASE_URL no está configurada en el archivo .env")
 }
 
+#[allow(dead_code)]
 pub async fn crear_pool() -> sqlx::Result<sqlx::Pool<sqlx::Postgres>> {
     let url_base_datos = obtener_url_base_datos();
 
